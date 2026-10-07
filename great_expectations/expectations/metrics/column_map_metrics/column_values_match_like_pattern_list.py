@@ -11,6 +11,7 @@ from great_expectations.expectations.metrics.map_metric_provider import (
     column_condition_partial,
 )
 from great_expectations.expectations.metrics.util import (
+    get_dialect_display_name,
     get_dialect_like_pattern_expression,
 )
 
@@ -40,8 +41,11 @@ class ColumnValuesMatchLikePatternList(ColumnMapMetricProvider):
             column, _dialect, like_pattern_list[0], escape=escape
         )
         if like_pattern_expression is None:
-            logger.warning(f"Like patterns are not supported for dialect {_dialect.dialect.name!s}")
-            raise NotImplementedError
+            dialect_name = get_dialect_display_name(_dialect)
+            logger.warning(f"Like patterns are not supported for dialect {dialect_name}")
+            raise NotImplementedError(
+                f"Like patterns are not supported for dialect {dialect_name}"
+            )
 
         if match_on == "any":
             condition = sa.or_(
