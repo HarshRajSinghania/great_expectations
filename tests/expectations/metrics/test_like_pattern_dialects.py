@@ -4,10 +4,9 @@ from types import ModuleType
 
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.dialects.mysql
+import sqlalchemy.dialects.oracle
 
-from great_expectations.expectations.metrics.column_map_metrics.column_values_match_like_pattern import (
-    ColumnValuesMatchLikePattern,
-)
 from great_expectations.expectations.metrics.like_pattern import (
     get_dialect_display_name,
     get_dialect_like_pattern_expression,
@@ -20,10 +19,11 @@ def _column() -> sa.Column:
 
 @pytest.mark.unit
 def test_like_expression_supports_oracle():
-    import sqlalchemy.dialects.oracle as oracle
-
     expression = get_dialect_like_pattern_expression(
-        column=_column(), dialect=oracle, like_pattern="foo%", positive=True
+        column=_column(),
+        dialect=sqlalchemy.dialects.oracle,
+        like_pattern="foo%",
+        positive=True,
     )
     assert expression is not None
     compiled = str(
@@ -67,12 +67,10 @@ def test_display_name_does_not_require_name_attribute():
 
 
 @pytest.mark.unit
-def test_unsupported_dialect_raises_not_implemented_with_name():
+def test_unsupported_dialect_is_named_without_attribute_error():
     class NamelessDialect(ModuleType):
         pass
 
     dialect = NamelessDialect("sqlalchemy_example")
-    with pytest.raises(NotImplementedError, match="sqlalchemy_example"):
-        ColumnValuesMatchLikePattern._sqlalchemy(
-            column=_column(), like_pattern="foo%", _dialect=dialect
-        )
+    assert get_dialect_like_pattern_expression(_column(), dialect, "foo%") is None
+    assert get_dialect_display_name(dialect) == "sqlalchemy_example"
