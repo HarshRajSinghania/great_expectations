@@ -5,13 +5,13 @@ import logging
 from great_expectations.execution_engine.sqlalchemy_execution_engine import (
     SqlAlchemyExecutionEngine,
 )
+from great_expectations.expectations.metrics.like_pattern import (
+    get_dialect_display_name,
+    get_dialect_like_pattern_expression,
+)
 from great_expectations.expectations.metrics.map_metric_provider import (
     ColumnMapMetricProvider,
     column_condition_partial,
-)
-from great_expectations.expectations.metrics.util import (
-    get_dialect_display_name,
-    get_dialect_like_pattern_expression,
 )
 
 logger = logging.getLogger(__name__)
